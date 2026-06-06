@@ -1,60 +1,81 @@
-# Saras Gautam Bari - Portfolio Website
+# 🌌 Saras Gautam Bari — Professional Portfolio
 
-A premium, modern, animated, and responsive portfolio website designed for **Saras Gautam Bari** as an **AI Engineer + Full-Stack Developer**.
+[![Live Site](https://img.shields.io/badge/Live_Site-sarasbari.vercel.app-blueviolet?style=for-the-badge&logo=vercel)](https://sarasbari.vercel.app)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Saras_Bari-0077B5?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/saras-bari-5b54b3278)
+[![GitHub](https://img.shields.io/badge/GitHub-Sarasbari-181717?style=for-the-badge&logo=github)](https://github.com/Sarasbari)
+
+A premium, highly interactive, and responsive portfolio website designed for **Saras Gautam Bari** showcasing expertise as an **AI Engineer & Full-Stack Developer**.
+
+---
+
+## ✨ Key Features
+
+- **Dynamic Animations**: Built with [Framer Motion](https://www.framer.com/motion/) for fluid transitions, smooth scroll behaviors, and responsive hover feedback.
+- **Modern UI/UX**: Aesthetic dark mode palette utilizing [Tailwind CSS v4](https://tailwindcss.com/) with a CSS-first design configuration.
+- **Data-Driven Architecture**: Easily customizable profile details, skills, achievements, and projects through typed configurations.
+- **Type-Safe Development**: Built entirely in **TypeScript** using **Next.js 16 (App Router)**.
+- **SEO & Performance Optimized**: Designed for fast load times, structured semantic HTML, and search visibility.
+
+---
 
 ## 🚀 Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Core Framework**: [Next.js 16](https://nextjs.org/) (App Router & React 19)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (CSS-first configuration)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Icons**: Custom optimized brand SVG icons + [Lucide React](https://lucide.dev/)
+- **Icons**: Custom SVG paths + [Lucide React](https://lucide.dev/)
 
 ---
 
 ## 🛠️ Data-Driven Architecture
 
-All content is managed through local TypeScript data configuration files. To modify any website text or links, update the following files:
+The portfolio's content is abstracted into type-safe configuration files. To update the website's content, modify the respective files in the `data/` directory:
 
-- `data/profile.ts`: Contains name, role, email, phone, location, links, bio summary, and resume path.
-- `data/projects.ts`: Project details (Sensei, aLiveHub, Ragify-AI, MinuteForge, text-to-sql-ai, snap-to-json).
-- `data/skills.ts`: Categorized skill chips (AI/ML, Languages, Frontend, Backend & DB, Tools & Deployment).
-- `data/achievements.ts`: Milestone listings (VMPS Winner, Hackathons, DSA Practice).
+- [profile.ts](file:///c:/coding/Portfolio/data/profile.ts): Manage personal info (name, role, tagline, social links, biography summary).
+- [projects.ts](file:///c:/coding/Portfolio/data/projects.ts): Add, edit, or remove showcase projects (Sensei, aLiveHub, Ragify-AI, MinuteForge, etc.).
+- [skills.ts](file:///c:/coding/Portfolio/data/skills.ts): Manage categorized skill sets (AI/ML, Languages, Frontend, Backend, Tools & Devops).
+- [achievements.ts](file:///c:/coding/Portfolio/data/achievements.ts): Highlight hackathons, milestones, and competitive programming achievements.
 
 ---
 
 ## 📸 Media & Attachments
 
-- **Profile Picture**: Placed at `public/images/sarasbari.jpeg`. A beautiful placeholder avatar is generated for you. Simply replace it with your real picture keeping the same filename.
-- **Resume**: Placed at `public/resume.pdf`. A placeholder text file is created for you. Replace it with your actual resume PDF to enable direct downloads.
+- **Profile Image**: Saved at `public/images/sarasbari.jpeg`. Replace this file with your own photo to update the profile avatar.
+- **Resume**: Saved at `public/resume.pdf`. Update this file with your latest resume PDF to enable direct visitor downloads.
 
 ---
 
 ## ⚙️ Getting Started
 
-First, install the dependencies and run the development server:
+To run the application locally, clone this repository and execute the following commands:
 
 ```bash
-# Install packages
+# Install dependencies
 npm install
 
-# Start development server
+# Start the local development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the local site.
 
 ---
 
-## 📦 Production & Deployment
+## 📦 Deployment & Hosting
 
-To run a production compilation:
+This project is fully optimized and configured for seamless deployment on **Vercel**:
 
-```bash
-npm run build
-```
+1. Push your local changes to your GitHub repository.
+2. Link your repository on the [Vercel Dashboard](https://vercel.com).
+3. Vercel automatically detects Next.js build specifications and deploys the site instantly.
+4. Future git pushes to the `main` branch will trigger automatic deployments.
 
-This app compiles with strict TypeScript typing, static page generation, and zero warnings. It is deploy-ready for [Vercel](https://vercel.com).
-- Push this repo to GitHub.
-- Import the repo into Vercel.
-- The default settings (Next.js build) will build and deploy the site instantly.
+---
+
+## 📬 Contact & Connect
+
+- **Email**: [sarasbari07@gmail.com](mailto:sarasbari07@gmail.com)
+- **Phone**: +91 96992 05609
+- **LinkedIn**: [Saras Bari](https://www.linkedin.com/in/saras-bari-5b54b3278)
+- **GitHub**: [@Sarasbari](https://github.com/Sarasbari)
