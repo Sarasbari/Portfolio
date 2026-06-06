@@ -24,7 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Saras Gautam Bari | AI Engineer & Full-Stack Developer",
+  title: "Saras Bari Portfolio",
   description:
     "I build production-ready AI systems, RAG pipelines, LLM integrations, and full-stack web apps. Information Technology Engineering student at VCET.",
   keywords: [
