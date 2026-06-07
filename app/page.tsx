@@ -59,9 +59,28 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     handleScroll(); // Initial run
 
+    // Intersection Observer for fade-in animations of sections and skill boxes
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px 0px -50px 0px",
+      threshold: 0.05,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("fade-in");
+        }
+      });
+    }, observerOptions);
+
+    const fadeElements = document.querySelectorAll(".section, .timeline-item, .skill-box");
+    fadeElements.forEach((el) => observer.observe(el));
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
     };
   }, []);
 
