@@ -1,121 +1,113 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { profile } from "@/data/profile";
-import { Menu, X, FileText } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-
-const navItems = [
-  { name: "About", href: "#about" },
-  { name: "Focus Areas", href: "#focus" },
-  { name: "Projects", href: "#projects" },
-  { name: "Skills", href: "#skills" },
-  { name: "Achievements", href: "#achievements" },
-  { name: "Contact", href: "#contact" },
-];
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState("light");
+  const [lastScroll, setLastScroll] = useState(0);
+  const [hidden, setHidden] = useState(false);
+  const [activeSection, setActiveSection] = useState("hero");
 
   useEffect(() => {
+    // Theme initialization
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setTheme(savedTheme);
+    document.body.setAttribute("data-theme", savedTheme);
+
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
+      const currentScroll = window.pageYOffset;
+
+      // Smart hide/show navbar
+      if (currentScroll > lastScroll && currentScroll > 100) {
+        setHidden(true);
+      } else if (currentScroll < lastScroll) {
+        setHidden(false);
       }
+      setLastScroll(currentScroll);
+
+      // Active section calculation
+      const sections = ["hero", "about", "experience", "skills", "contact"];
+      let currentSection = "hero";
+      for (const sectionId of sections) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+            currentSection = sectionId;
+          }
+        }
+      }
+      setActiveSection(currentSection);
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScroll]);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.body.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
+
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const section = document.querySelector(targetId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-bg-deep/80 backdrop-blur-md border-b border-border-dark/50 py-3 shadow-lg"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
-        <a href="#hero" className="flex items-center gap-2 group">
-          <span className="text-xl font-bold font-sora tracking-wider text-text-primary group-hover:text-gradient-cyan-violet transition-colors">
-            {"<"}{profile.shortName}{" />"}
-          </span>
-        </a>
-
-        {/* Desktop Nav Items */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="text-sm font-medium text-text-muted hover:text-neon-cyan transition-colors relative group py-2 font-sora"
-            >
-              {item.name}
-              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-neon-cyan to-electric-violet transition-all duration-300 group-hover:w-full" />
-            </a>
-          ))}
-        </nav>
-
-        {/* Resume & Mobile Menu Button */}
-        <div className="flex items-center gap-4">
+    <nav className={`navbar ${hidden ? "navbar-hidden" : ""}`}>
+      <div className="nav-content">
+        <a href="#hero" className="nav-brand" onClick={(e) => scrollToSection(e, "#hero")}>SB</a>
+        <div className="nav-right">
           <a
-            href={profile.resume}
-            download
-            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 text-xs font-semibold tracking-wide transition-all glow-cyan font-mono-jb"
+            href="#hero"
+            className={`nav-link ${activeSection === "hero" ? "active" : ""}`}
+            onClick={(e) => scrollToSection(e, "#hero")}
           >
-            <FileText size={14} />
-            <span>RESUME</span>
+            Home
+          </a>
+          <a
+            href="#about"
+            className={`nav-link ${activeSection === "about" ? "active" : ""}`}
+            onClick={(e) => scrollToSection(e, "#about")}
+          >
+            About
+          </a>
+          <a
+            href="#experience"
+            className={`nav-link ${activeSection === "experience" ? "active" : ""}`}
+            onClick={(e) => scrollToSection(e, "#experience")}
+          >
+            Journey
+          </a>
+          <a
+            href="#skills"
+            className={`nav-link ${activeSection === "skills" ? "active" : ""}`}
+            onClick={(e) => scrollToSection(e, "#skills")}
+          >
+            Skills
+          </a>
+          
+          {/* Featured Deployed Projects */}
+          <a href="https://alivehub.vercel.app" target="_blank" rel="noopener noreferrer" className="nav-lazyfire" title="aLiveHub - Turf Booking SaaS">
+            <span className="nav-lazyfire-text">🏟️ aLiveHub</span>
+          </a>
+          <a href="https://text-to-sql-ai.vercel.app" target="_blank" rel="noopener noreferrer" className="nav-lazyfire" title="Text-to-SQL AI">
+            <span className="nav-lazyfire-text">🤖 Text-to-SQL</span>
           </a>
 
-          {/* Hamburger Menu */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-text-primary hover:text-neon-cyan transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          <a href="#contact" className="nav-cta" onClick={(e) => scrollToSection(e, "#contact")}>Get in Touch!</a>
+          <button id="theme-toggle" className="theme-toggle-nav" aria-label="Toggle theme" onClick={toggleTheme}>
+            <i className={`fas ${theme === "dark" ? "fa-sun" : "fa-moon"}`}></i>
           </button>
         </div>
       </div>
-
-      {/* Mobile Nav Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden absolute top-full left-0 right-0 bg-surface-ink border-b border-border-dark py-6 px-6 shadow-xl"
-          >
-            <nav className="flex flex-col gap-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-base font-semibold text-text-muted hover:text-neon-cyan transition-colors py-2 font-sora border-b border-border-dark/30"
-                >
-                  {item.name}
-                </a>
-              ))}
-              <a
-                href={profile.resume}
-                download
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center gap-2 mt-4 px-4 py-3 rounded-xl bg-gradient-to-r from-neon-cyan to-electric-violet text-bg-deep text-sm font-bold tracking-wider hover:opacity-90 transition-opacity font-sora"
-              >
-                <FileText size={16} />
-                <span>DOWNLOAD RESUME</span>
-              </a>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+    </nav>
   );
 }
+

@@ -1,269 +1,179 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { profile } from "@/data/profile";
-import { ArrowRight, Mail, Phone, FileText } from "lucide-react";
-import { Github, Linkedin } from "./BrandIcons";
-import { motion } from "framer-motion";
 
 export default function Hero() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [greeting, setGreeting] = useState("Hi there! 👋");
+  const [tilted, setTilted] = useState(false);
+  const [fallen, setFallen] = useState(false);
+  const heroContentRef = useRef<HTMLDivElement>(null);
+  const decoTerminalRef = useRef<HTMLDivElement>(null);
 
+  // Scrambled Matrix Typing Effect
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const finalText = "Hi there! 👋";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+    let iterations = 0;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const timeout = setTimeout(() => {
+      const interval = setInterval(() => {
+        setGreeting(
+          finalText
+            .split("")
+            .map((char, index) => {
+              if (index < iterations) {
+                return finalText[index];
+              }
+              if (char === " " || char === "👋") {
+                return char;
+              }
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join("")
+        );
 
-    let animationFrameId: number;
-    let width = (canvas.width = canvas.offsetWidth);
-    let height = (canvas.height = canvas.offsetHeight);
-
-    const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
-    };
-    window.addEventListener("resize", handleResize);
-
-    // Node definition representing chunks or vectors in a RAG database
-    interface Particle {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      radius: number;
-      color: string;
-    }
-
-    const colors = ["#22D3EE", "#A855F7", "#F472B6", "#A3E635"];
-    const particles: Particle[] = [];
-    const particleCount = Math.min(40, Math.floor((width * height) / 20000));
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
-        radius: Math.random() * 2 + 1.5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-      });
-    }
-
-    const draw = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      // Draw connections first
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
-          if (dist < 100) {
-            const alpha = (1 - dist / 100) * 0.15;
-            ctx.strokeStyle = `rgba(42, 52, 72, ${alpha})`;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
+        if (iterations >= finalText.length) {
+          clearInterval(interval);
         }
+
+        iterations += 1 / 3;
+      }, 50);
+
+      return () => clearInterval(interval);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  // Scroll Animations (Image Tilt and Falling Terminal SVG)
+  useEffect(() => {
+    const calculateFallDistance = () => {
+      if (heroContentRef.current && decoTerminalRef.current) {
+        const heroContentRect = heroContentRef.current.getBoundingClientRect();
+        const heroContentBottom = heroContentRect.bottom;
+        const terminalRect = decoTerminalRef.current.getBoundingClientRect();
+        const terminalFall = Math.max(0, heroContentBottom - terminalRect.bottom - 50);
+        decoTerminalRef.current.style.setProperty("--fall-distance", `${terminalFall}px`);
       }
-
-      // Draw nodes
-      for (const p of particles) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = p.color;
-        ctx.fill();
-        ctx.shadowBlur = 0; // Reset shadow
-
-        // Move
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Bounce boundaries
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-      }
-
-      animationFrameId = requestAnimationFrame(draw);
     };
 
-    draw();
+    calculateFallDistance();
+    window.addEventListener("resize", calculateFallDistance);
+
+    const handleScroll = () => {
+      if (window.scrollY > 5) {
+        setTilted(true);
+        setFallen(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", calculateFallDistance);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
+  const handleScrollToContact = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const contactSection = document.getElementById("contact");
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden bg-mesh-grid"
-    >
-      {/* Background Interactive Neural Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-60"
-      />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        {/* Bio Text */}
-        <div className="lg:col-span-7 flex flex-col items-start text-left">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-ink border border-border-dark text-xs text-neon-cyan font-semibold tracking-wider font-mono-jb mb-6"
-          >
-            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
-            <span>AVAILABLE FOR INTERNSHIPS & ROLES</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-7xl font-extrabold font-sora tracking-tight leading-none mb-4"
-          >
-            Hi, I'm <br className="sm:hidden" />
-            <span className="text-gradient-cyan-violet">{profile.name}</span>
-          </motion.h1>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg sm:text-2xl font-bold font-sora text-text-muted mb-6"
-          >
-            {profile.role}
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-base sm:text-lg text-text-muted max-w-xl mb-8 leading-relaxed"
-          >
-            {profile.tagline}
-          </motion.p>
-
-          {/* Call to Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-wrap gap-4 mb-8"
-          >
-            <a
-              href="#projects"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-neon-cyan to-electric-violet text-bg-deep font-bold tracking-wide shadow-lg hover:shadow-electric-violet/20 hover:scale-[1.02] transition-all"
-            >
-              <span>Explore Projects</span>
-              <ArrowRight size={18} />
+    <section className="hero" id="hero">
+      <div className="hero-content" ref={heroContentRef}>
+        <div className="hero-left">
+          <p className="hero-greeting" id="hero-greeting">{greeting}</p>
+          <h1 className="hero-name">I'm {profile.name}.</h1>
+          <p className="hero-description">
+            Based in {profile.location}, I'm an {profile.role}. I build production-ready AI systems, RAG pipelines, LLM integrations, and full-stack web apps. I'm passionate about agentic workflows, vector databases, and building deployed web products.
+          </p>
+          <div className="hero-social">
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="GitHub">
+              <i className="fab fa-github"></i>
             </a>
-
-            <a
-              href="#contact"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-surface-ink border border-border-dark text-text-primary font-bold hover:bg-surface-elevated transition-all"
-            >
-              <span>Get In Touch</span>
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="LinkedIn">
+              <i className="fab fa-linkedin"></i>
             </a>
-          </motion.div>
-
-          {/* Social Links */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="flex flex-wrap items-center gap-6"
-          >
-            <a
-              href={profile.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text-muted hover:text-neon-cyan transition-colors"
-              aria-label="GitHub"
-            >
-              <Github size={22} />
+            <a href={`mailto:${profile.email}`} className="social-btn" aria-label="Email">
+              <i className="fas fa-envelope"></i>
             </a>
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text-muted hover:text-electric-violet transition-colors"
-              aria-label="LinkedIn"
-            >
-              <Linkedin size={22} />
+            <a href={`tel:${profile.phone.replace(/\s+/g, "")}`} className="social-btn" aria-label="Phone">
+              <i className="fas fa-phone"></i>
             </a>
-            <a
-              href={`mailto:${profile.email}`}
-              className="text-text-muted hover:text-hot-pink transition-colors"
-              aria-label="Email"
-            >
-              <Mail size={22} />
+          </div>
+          <div className="hero-cta-container">
+            <a href={profile.resume} download className="btn-cta" style={{ background: "var(--cyan)" }}>
+              <i className="fas fa-file-pdf"></i> Resume
             </a>
-            <a
-              href={`tel:${profile.phone.replace(/\s+/g, "")}`}
-              className="text-text-muted hover:text-signal-lime transition-colors"
-              aria-label="Phone"
-            >
-              <Phone size={22} />
+            <a href="#contact" className="btn-cta" onClick={handleScrollToContact}>
+              Get in Touch!
             </a>
-          </motion.div>
+          </div>
         </div>
-
-        {/* Profile Image Column */}
-        <div className="lg:col-span-5 flex justify-center lg:justify-end">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-3xl overflow-hidden group"
-          >
-            {/* Pulsing Gradient Orbit Ring */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-neon-cyan via-electric-violet to-hot-pink rounded-3xl p-1 animate-pulse">
-              <div className="absolute inset-1 bg-bg-deep rounded-3xl z-0" />
+        <div className="hero-right">
+          <div className="hero-image-wrapper">
+            <div className="tape-sticker"></div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={profile.photo}
+              alt={profile.name}
+              className={`hero-photo ${tilted ? "tilted" : ""}`}
+              width="400"
+              height="400"
+              fetchPriority="high"
+              onMouseEnter={() => setTilted(false)}
+              onMouseLeave={() => {
+                if (window.scrollY > 5) setTilted(true);
+              }}
+            />
+            <div className="deco-code">
+              <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="6" width="88" height="88" rx="8" fill="#66d9ef" stroke="#000" stroke-width="4" />
+                <rect x="3" y="3" width="88" height="88" rx="8" fill="#66d9ef" stroke="#000" stroke-width="4" />
+                <path d="M35 40 L20 50 L35 60" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M65 40 L80 50 L65 60" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                <line x1="55" y1="35" x2="45" y2="65" stroke="#000" stroke-width="5" stroke-linecap="round" />
+              </svg>
             </div>
-
-            {/* Actual image */}
-            <div className="absolute inset-2 rounded-2xl overflow-hidden z-10">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={profile.photo}
-                alt={profile.name}
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-[1.01] group-hover:scale-105"
-                onError={(e) => {
-                  // Fallback: If image fails to load, render styled placeholder
-                  e.currentTarget.style.display = "none";
-                  const fallback = document.getElementById("profile-fallback");
-                  if (fallback) fallback.style.display = "flex";
-                }}
-              />
-
-              {/* Profile Image Fallback (Beautifully styled SVG) */}
-              <div
-                id="profile-fallback"
-                className="hidden w-full h-full bg-surface-ink flex-col items-center justify-center text-center p-6 text-text-muted"
-              >
-                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-neon-cyan to-electric-violet flex items-center justify-center text-bg-deep text-2xl font-bold font-sora mb-4">
-                  SB
-                </div>
-                <h3 className="text-text-primary font-bold font-sora">{profile.name}</h3>
-                <p className="text-xs font-mono-jb text-text-muted mt-1">{profile.role}</p>
-              </div>
+            <div className={`deco-terminal ${fallen ? "falling" : ""}`} ref={decoTerminalRef}>
+              <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="6" width="88" height="88" rx="8" fill="#ffd93d" stroke="#000" stroke-width="4" />
+                <rect x="3" y="3" width="88" height="88" rx="8" fill="#ffd93d" stroke="#000" stroke-width="4" />
+                <path d="M25 35 L40 50 L25 65" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                <line x1="50" y1="65" x2="75" y2="65" stroke="#000" stroke-width="5" stroke-linecap="round" />
+              </svg>
             </div>
-
-            {/* Glowing blur behind the card */}
-            <div className="absolute -inset-4 bg-gradient-to-tr from-neon-cyan to-electric-violet rounded-3xl opacity-30 blur-2xl -z-10 group-hover:opacity-40 transition-opacity" />
-          </motion.div>
+            <div className="deco-floppy">
+              <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="6" width="88" height="88" rx="8" fill="#a8e6cf" stroke="#000" stroke-width="4" />
+                <rect x="3" y="3" width="88" height="88" rx="8" fill="#a8e6cf" stroke="#000" stroke-width="4" />
+                <rect x="20" y="20" width="60" height="60" rx="3" fill="#ffd93d" stroke="#000" stroke-width="4" />
+                <rect x="30" y="20" width="40" height="20" fill="#66d9ef" stroke="#000" stroke-width="3" />
+                <rect x="35" y="55" width="30" height="15" rx="2" fill="#000" />
+                <circle cx="50" cy="35" r="3" fill="#000" />
+              </svg>
+            </div>
+            <div className="deco-label">AI Engineer</div>
+          </div>
         </div>
+      </div>
+      <div className="tech-badges">
+        <span className="tech-badge"><i className="fab fa-python"></i> Python</span>
+        <span className="tech-badge"><i className="fab fa-react"></i> React</span>
+        <span className="tech-badge"><i className="fab fa-js"></i> TypeScript</span>
+        <span className="tech-badge"><i className="fas fa-brain"></i> FastAPI</span>
+        <span className="tech-badge"><i className="fas fa-database"></i> ChromaDB</span>
+        <span className="tech-badge"><i className="fab fa-docker"></i> Docker</span>
+        <span className="tech-badge"><i className="fab fa-git"></i> Git</span>
+        <span className="tech-badge"><i className="fas fa-cloud"></i> Vercel</span>
       </div>
     </section>
   );
 }
+
